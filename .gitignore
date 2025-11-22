@@ -1,0 +1,51 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build outputs
+dist/
+build/
+.tmp/
+.cache/
+.parcel-cache/
+.vite/
+
+# Coverage
+coverage/
+*.lcov
+.nyc_output/
+
+# IDE/editor
+.vscode/
+.idea/
+*.swp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Misc
+.eslintcache
+tsconfig.tsbuildinfo
+.repl_history
+
+# Uploads or temp data (uncomment if applicable)
+# uploads/
+# tmp/
+*** End Patch***  }```"/>
+
