@@ -1,8 +1,29 @@
 const User = require("../models/User");
-const { generateAccessToken } = require("../utils/jwt");
+const {
+  generateAccessToken,
+  generateRefreshToken,
+  generateVerificationToken,
+  generateResetToken,
+  verifyToken,
+  decodeToken,
+} = require("../utils/jwt");
+const { formatError, formatSuccess } = require("../utils/helpers");
+const { validationResult } = require("express-validator");
 
-exports.register = async (req, res) => {
+/**
+ *  Register new user (Officer only)
+ */
+const register = async (req, res) => {
   try {
+    // check validation errors
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: "Validation failed",
+        errors: errors.array(),
+      });
+    }
     const { name, email, password, phone, role, stationID, licenseNumber } =
       req.body;
 
@@ -11,7 +32,7 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "Email already in Use",
+        message: "Email already exists",
       });
     }
 
@@ -30,25 +51,39 @@ exports.register = async (req, res) => {
       userId: user._id,
       role: user.role,
     });
-    console.log(accessToken);
+    const refreshToken = generateRefreshToken({
+      userId: user._id,
+    });
 
-    // pick public fields
-    const publicUser = {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      phone: user.phone,
-      role: user.role,
-      stationIds: user.stationIds,
-      licenseNumber: user.licenseNumber,
-      employeeId: user.employeeID,
-    };
+    // Save refresh token at database
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 30);
 
-    return res.status(201).json({ user: publicUser, token: accessToken });
+    await refreshToken.create({
+      token: refreshToken,
+      user: user._id,
+      expiresAt,
+    });
+
+    // Return user data (without password)
+    const userData = user.toObject();
+    delete userData.password;
+
+    res.status(201).json(
+      formatSuccess(
+        {
+          user: userData,
+          accessToken,
+          refreshToken,
+        },
+        "User registered successfully. Credentials sent via email"
+      )
+    );
   } catch (err) {
-    return res
-      .status(400)
-      .json({ message: err.message || "Registration Failed" });
+    console.error("Registration error:", error);
+    res
+      .status(500)
+      .json(formatError(error.message || "Registration failed", 500));
   }
 };
 
@@ -103,10 +138,12 @@ exports.login = async (req, res) => {
 exports.me = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
+    console.log(user);
+
     if (!user) return res.status(404).json({ message: "User not found" });
 
     const publicUser = {
-      id: user._id,
+      userID: user._id,
       name: user.name,
       email: user.email,
       phone: user.phone,
