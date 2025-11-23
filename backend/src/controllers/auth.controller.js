@@ -9,6 +9,7 @@ const {
 } = require("../utils/jwt");
 const { formatError, formatSuccess } = require("../utils/helpers");
 const { validationResult } = require("express-validator");
+const RefreshToken = require("../models/RefreshToken");
 
 /**
  *  Register new user (Officer only)
@@ -55,11 +56,15 @@ const register = async (req, res) => {
       userId: user._id,
     });
 
+    console.log(`accessToken: ${accessToken}`);
+    console.log(`refreshToken: ${refreshToken}`);
+
+
     // Save refresh token at database
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 30);
 
-    await refreshToken.create({
+    await RefreshToken.create({
       token: refreshToken,
       user: user._id,
       expiresAt,
@@ -80,14 +85,14 @@ const register = async (req, res) => {
       )
     );
   } catch (err) {
-    console.error("Registration error:", error);
+    console.error("Registration error:", err);
     res
       .status(500)
-      .json(formatError(error.message || "Registration failed", 500));
+      .json(formatError(err.message || "Registration failed", 500));
   }
 };
 
-exports.login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -135,7 +140,7 @@ exports.login = async (req, res) => {
   }
 };
 
-exports.me = async (req, res) => {
+const me = async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
     console.log(user);
@@ -160,3 +165,5 @@ exports.me = async (req, res) => {
       .json({ message: err.message || "Failed to load profile" });
   }
 };
+
+module.exports = { register, login, me };

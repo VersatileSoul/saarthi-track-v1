@@ -10,7 +10,7 @@ const authMiddleware = async (req, res, next) => {
     // Get token from header
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startWith("Bearer")) {
+    if (!authHeader || !authHeader.startsWith("Bearer")) {
       return res.status(401).json({
         success: false,
         message:
@@ -67,7 +67,7 @@ const authMiddleware = async (req, res, next) => {
 
     // Add user to request object
     req.user = {
-      userId: user._id.toString(),
+      id: user._id.toString(),
       role: user.role,
       email: user.email,
       user: user,

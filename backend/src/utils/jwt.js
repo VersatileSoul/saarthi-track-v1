@@ -83,7 +83,7 @@ const generateResetToken = (payload) => {
  */
 const verifyToken = (token, secret = process.env.JWT_SECRET) => {
   try {
-    jwt.verify(token, secret);
+    return jwt.verify(token, secret);
   } catch (error) {
     if (error.name === "TokenExpiredError") {
       throw new Error("Token has expired");

@@ -5,7 +5,7 @@
  * @returns {Function} Express middleware
  */
 const roleMiddleware = (...roles) => {
-  return (res, req, next) => {
+  return (req, res, next) => {
     // check if user is authenticated (authMiddleware should run first)
     if (!req.user) {
       return res.status(401).json({
@@ -31,4 +31,4 @@ const roleMiddleware = (...roles) => {
   };
 };
 
-modules.exports = roleMiddleware;
+module.exports = roleMiddleware;
