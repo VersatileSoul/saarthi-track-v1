@@ -44,6 +44,9 @@ desktop.ini
 tsconfig.tsbuildinfo
 .repl_history
 
+# Documentation
+PLAN_OF_ACTION.md
+
 # Uploads or temp data (uncomment if applicable)
 # uploads/
 # tmp/
