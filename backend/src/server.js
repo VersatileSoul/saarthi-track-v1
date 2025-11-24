@@ -25,6 +25,9 @@ const io = socketIo(server, {
   },
 });
 
+// Initialize Socket.io handlers
+initializeSocket(io);
+
 // Middleware
 app.use(helmet());
 app.use(compression());

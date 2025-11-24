@@ -43,7 +43,7 @@ const authMiddleware = async (req, res, next) => {
     if (decoded.type !== "access") {
       return res.status(401).json({
         success: false,
-        message: error.message || "Invalid token type. Access token required",
+        message: "Invalid token type. Access token required",
       });
     }
 
